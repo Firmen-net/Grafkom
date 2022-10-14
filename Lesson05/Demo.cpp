@@ -46,6 +46,11 @@ void Demo::ProcessInput(GLFWwindow *window) {
 
 void Demo::Update(double deltaTime) {
 	angle += (float) ((deltaTime * 1.5f) / 100);
+	
+}
+
+float Demo::bezier(float t, float point1, float point2, float point3) {
+	return ((1 - t) * (1 - t) * point1) + (2 * (1 - t) * t * point2) + (t * t * point3);
 }
 
 void Demo::Render() {
@@ -58,19 +63,33 @@ void Demo::Render() {
 
 	glEnable(GL_DEPTH_TEST);
 
+	
+	if (segment < segmentCount) {
+		gerakX = bezier(segment / segmentCount, jalurx[indexPos % sizeCurve] * scaleCurve, jalurx[(indexPos + 1) % sizeCurve] * scaleCurve, jalurx[(indexPos + 2) % sizeCurve] * scaleCurve);
+		gerakY = bezier(segment++ / segmentCount, jalury[indexPos % sizeCurve] * scaleCurve, jalury[(indexPos + 1) % sizeCurve] * scaleCurve, jalury[(indexPos + 2) % sizeCurve] * scaleCurve) + 10;
+		std::cout << "indexPos : " << indexPos << "\nposx : " << gerakX << "\nposy : " << gerakY << "\n\n";
+
+		if (segment == segmentCount) {
+			segment = 0;
+			indexPos += 3;
+		}
+	}
+
+
 	// Pass perspective projection matrix
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)this->screenWidth / (GLfloat)this->screenHeight, 0.1f, 100.0f);
 	GLint projLoc = glGetUniformLocation(this->shaderProgram, "projection");
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 	// LookAt camera (position, target/direction, up)
-	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 15), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	glm::mat4 view = glm::lookAt(glm::vec3(gerakX, 15, gerakY + 40), glm::vec3(gerakX, 0, gerakY), glm::vec3(0, 1, 0));
 	GLint viewLoc = glGetUniformLocation(this->shaderProgram, "view");
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
 	DrawColoredCube(0, 0.5, 2, 0, 3, 3, 3);
 	DrawColoredCube(0, -1, 1.7, 0, 3, 2.3, 3);
 	DrawColoredCube(0, -2, 1.3, 0, 3, 1.5, 3);
+	DrawColoredCube(0, 0.5, 1.5, 0, 2, 0.4, 7);
 
 	DrawColoredCube(0, 3, 2, 0, 2, 1, 1.5);
 	DrawColoredCube(0, 5, 2.1, 0, 3, 0.6, 1.5);
@@ -93,7 +112,7 @@ void Demo::BuildColoredCube() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	int width, height;
-	unsigned char* image = SOIL_load_image("crate.png", &width, &height, 0, SOIL_LOAD_RGBA);
+	unsigned char* image = SOIL_load_image("marble.png", &width, &height, 0, SOIL_LOAD_RGBA);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 	SOIL_free_image_data(image);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -193,8 +212,11 @@ void Demo::DrawColoredCube(int rotate, float posX, float posY, float posZ,float 
 	glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
 
 	glm::mat4 model;
-	model = glm::translate(model, glm::vec3(posX, posY, posZ));
-	
+	//model = glm::translate(model,glm::vec3(posX, posY, posZ));
+
+	model = glm::translate(model, glm::vec3(posX+ gerakX, posY, posZ + gerakY));
+
+
 //	model = glm::rotate(model, angle, glm::vec3(0, 1, 0));
 	if (rotate == 1) {
 		model = glm::rotate(model, angle, glm::vec3(0, 0, 1));
@@ -236,10 +258,10 @@ void Demo::BuildColoredPlane()
 	GLfloat vertices[] = {
 		// format position, tex coords
 		// bottom
-		-50.0, -0.5, -50.0,  0,  0,
-		 50.0, -0.5, -50.0, 50,  0,
-		 50.0, -0.5,  50.0, 50, 50,
-		-50.0, -0.5,  50.0,  0, 50,
+		-150.0, -0.5, -150.0,  0,  0,
+		 150.0, -0.5, -150.0, 150,  0,
+		 150.0, -0.5,  150.0, 150, 150,
+		-150.0, -0.5,  150.0,  0, 150,
 
 
 	};
