@@ -1,16 +1,10 @@
 #include "Demo.h"
 
-
-
 Demo::Demo() {
-
 }
-
 
 Demo::~Demo() {
 }
-
-
 
 void Demo::Init() {
 	// build and compile our shader program
@@ -35,21 +29,17 @@ void Demo::DeInit() {
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-void Demo::ProcessInput(GLFWwindow *window) {
+void Demo::ProcessInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
-
-
-
 }
 
 void Demo::Update(double deltaTime) {
-	angle += (float) ((deltaTime * 1.5f) / 100);
-	
+	angle += (float)((deltaTime * 1.5f) / 100);
 }
 
-float Demo::bezier(float t, float point1, float point2, float point3) {
+float Demo::beziewr(float t, float point1, float point2, float point3) {
 	return ((1 - t) * (1 - t) * point1) + (2 * (1 - t) * t * point2) + (t * t * point3);
 }
 
@@ -63,7 +53,6 @@ void Demo::Render() {
 
 	glEnable(GL_DEPTH_TEST);
 
-	
 	if (segment < segmentCount) {
 		gerakX = bezier(segment / segmentCount, jalurx[indexPos % sizeCurve] * scaleCurve, jalurx[(indexPos + 1) % sizeCurve] * scaleCurve, jalurx[(indexPos + 2) % sizeCurve] * scaleCurve);
 		gerakY = bezier(segment++ / segmentCount, jalury[indexPos % sizeCurve] * scaleCurve, jalury[(indexPos + 1) % sizeCurve] * scaleCurve, jalury[(indexPos + 2) % sizeCurve] * scaleCurve) + 10;
@@ -74,7 +63,6 @@ void Demo::Render() {
 			indexPos += 3;
 		}
 	}
-
 
 	// Pass perspective projection matrix
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)this->screenWidth / (GLfloat)this->screenHeight, 0.1f, 100.0f);
@@ -94,7 +82,7 @@ void Demo::Render() {
 	DrawColoredCube(0, 3, 2, 0, 2, 1, 1.5);
 	DrawColoredCube(0, 5, 2.1, 0, 3, 0.6, 1.5);
 	DrawColoredCube(1, 5.7, 2, 2, 0.5, 3, 0.5);
-	
+
 	DrawColoredCube(0, 0, 4, 0, 1, 1, 1);
 	DrawColoredCube(2, 0, 4.7, 0, 12, 0.5, 0.5);
 
@@ -106,7 +94,7 @@ void Demo::Render() {
 void Demo::BuildColoredCube() {
 	// load image into texture memory
 	// ------------------------------
-	// Load and create a texture 
+	// Load and create a texture
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -134,7 +122,7 @@ void Demo::BuildColoredCube() {
 		0.5, -0.5,  0.5, 0, 1,  // 7
 
 		// back
-		-0.5, -0.5, -0.5, 0, 0, // 8 
+		-0.5, -0.5, -0.5, 0, 0, // 8
 		0.5,  -0.5, -0.5, 1, 0, // 9
 		0.5,   0.5, -0.5, 1, 1, // 10
 		-0.5,  0.5, -0.5, 0, 1, // 11
@@ -156,8 +144,6 @@ void Demo::BuildColoredCube() {
 		0.5, -0.5, -0.5, 1, 0,  // 21
 		0.5, -0.5,  0.5, 1, 1,  // 22
 		-0.5, -0.5,  0.5, 0, 1, // 23
-
-
 	};
 
 	unsigned int indices[] = {
@@ -198,10 +184,9 @@ void Demo::BuildColoredCube() {
 
 	// remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
 }
 
-void Demo::DrawColoredCube(int rotate, float posX, float posY, float posZ,float scaleX, float scaleY, float scaleZ)
+void Demo::DrawColoredCube(int rotate, float posX, float posY, float posZ, float scaleX, float scaleY, float scaleZ)
 {
 	glUseProgram(shaderProgram);
 
@@ -214,17 +199,15 @@ void Demo::DrawColoredCube(int rotate, float posX, float posY, float posZ,float 
 	glm::mat4 model;
 	//model = glm::translate(model,glm::vec3(posX, posY, posZ));
 
-	model = glm::translate(model, glm::vec3(posX+ gerakX, posY, posZ + gerakY));
+	model = glm::translate(model, glm::vec3(posX + gerakX, posY, posZ + gerakY));
 
-
-//	model = glm::rotate(model, angle, glm::vec3(0, 1, 0));
+	//	model = glm::rotate(model, angle, glm::vec3(0, 1, 0));
 	if (rotate == 1) {
 		model = glm::rotate(model, angle, glm::vec3(0, 0, 1));
 	}
-	else if(rotate == 2) {
+	else if (rotate == 2) {
 		model = glm::rotate(model, angle, glm::vec3(0, 1, 0));
 	}
-
 
 	model = glm::scale(model, glm::vec3(scaleX, scaleY, scaleZ));
 
@@ -239,7 +222,7 @@ void Demo::DrawColoredCube(int rotate, float posX, float posY, float posZ,float 
 
 void Demo::BuildColoredPlane()
 {
-	// Load and create a texture 
+	// Load and create a texture
 	glGenTextures(1, &texture2);
 	glBindTexture(GL_TEXTURE_2D, texture2);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -262,8 +245,6 @@ void Demo::BuildColoredPlane()
 		 150.0, -0.5, -150.0, 150,  0,
 		 150.0, -0.5,  150.0, 150, 150,
 		-150.0, -0.5,  150.0,  0, 150,
-
-
 	};
 
 	GLuint indices[] = { 0,  2,  1,  0,  3,  2 };
@@ -290,8 +271,6 @@ void Demo::BuildColoredPlane()
 	glBindVertexArray(0); // Unbind VAO
 }
 
-
-
 void Demo::DrawColoredPlane()
 {
 	glUseProgram(shaderProgram);
@@ -313,6 +292,6 @@ void Demo::DrawColoredPlane()
 }
 
 int main(int argc, char** argv) {
-	RenderEngine &app = Demo();
+	RenderEngine& app = Demo();
 	app.Start("Transformation: Transform Cube", 800, 600, false, false);
 }
